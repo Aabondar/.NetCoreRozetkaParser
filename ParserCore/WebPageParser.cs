@@ -13,14 +13,13 @@ namespace ParserCore
         private int pageCounter = 1;
         private int refCounter = 0;
         private string curRefer;
-        HttpClient client;
 
         public void PrintMatches()
         {
             Console.WriteLine(refCounter + " matches found!");
         }
 
-        public async void ParseWebPage(string refer)
+        public void ParseWebPage(string refer)
         {
             string result;
             int cutIndex;
@@ -29,28 +28,19 @@ namespace ParserCore
             if (pageCounter == 1)
                 curRefer = refer;
 
-            //HttpWebRequest request = (HttpWebRequest)WebRequest.Create(curRefer);
-            client = new HttpClient();
-            
-            
-            //request.Method = "GET";
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(curRefer);         
+            request.Method = "GET";
 
             // поискать библиотеки для работы с json
             try
             {
-                HttpResponseMessage response = await client.GetAsync(curRefer);
-                response.EnsureSuccessStatusCode();
-                //using (var response = request.GetResponse())
-                //using (var stream = response.GetResponseStream())
-                //using (var reader = new StreamReader(stream))
+                using (var response = request.GetResponse())
+                using (var stream = response.GetResponseStream())
+                using (var reader = new StreamReader(stream))
                 
                 {
-                    //string webPageBuffer = reader.ReadToEnd(); //Переменная для хранения веб страницы
-                    string webPageBuffer = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine(webPageBuffer);
-                    //string searchPattern; //Поисковый паттерн регулярного выражения
-
-                    var searchPattern = @"https://hard.rozetka.com.ua/(\S*?)img";
+                    string webPageBuffer = reader.ReadToEnd(); //Переменная для хранения веб страницы
+                    var searchPattern = @"https://hard.rozetka.com.ua/(\S*?)img";  //Поисковый паттерн регулярного выражения
                     Match match = Regex.Match(webPageBuffer, searchPattern);
 
                     if (match.Success)
@@ -92,5 +82,12 @@ namespace ParserCore
                 Environment.Exit(-5);
             }
         }
+        public void ParseGoodsPage()
+        {
+
+        }
+
+
+
     }
 }
